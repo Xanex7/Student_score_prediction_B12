@@ -404,3 +404,125 @@ predict = st.button(
 )
 
 st.markdown("</div>", unsafe_allow_html=True)
+# ==========================================================
+# PREDICTION
+# ==========================================================
+
+if predict:
+
+    # Create dataframe
+    input_df = pd.DataFrame({
+        "hours_studied": [hours_studied],
+        "sleep_hours": [sleep_hours],
+        "attendance_percent": [attendance_percent],
+        "previous_scores": [previous_scores]
+    })
+
+    # Predict
+    prediction = float(model.predict(input_df)[0])
+
+    # Performance Level
+    if prediction >= 85:
+        level = "🏆 Excellent"
+        color = "#16a34a"
+        msg = "Outstanding Performance Expected."
+    elif prediction >= 70:
+        level = "✅ Good"
+        color = "#2563eb"
+        msg = "Good Performance Expected."
+    elif prediction >= 50:
+        level = "⚠ Average"
+        color = "#f59e0b"
+        msg = "Average Performance Expected."
+    else:
+        level = "❌ Needs Improvement"
+        color = "#dc2626"
+        msg = "Needs More Academic Attention."
+
+    # Pass / Fail
+    if prediction >= 40:
+        result = "🎉 PASS"
+        result_color = "#16a34a"
+        st.balloons()
+    else:
+        result = "❌ FAIL"
+        result_color = "#dc2626"
+
+    st.markdown("---")
+
+    st.markdown(f"""
+    <div class="resultCard">
+
+    <h1 style="color:white;">
+    🎯 Prediction Result
+    </h1>
+
+    <h1 style="
+    color:#60a5fa;
+    font-size:70px;
+    ">
+    {prediction:.2f}
+    </h1>
+
+    <h2 style="color:{color};">
+    {level}
+    </h2>
+
+    <h2 style="color:{result_color};">
+    {result}
+    </h2>
+
+    <p style="color:#d1d5db;font-size:18px;">
+    {msg}
+    </p>
+
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.progress(min(prediction/100,1.0))
+
+    st.subheader("📊 Prediction Summary")
+
+    c1,c2,c3 = st.columns(3)
+
+    c1.metric("Predicted Score", f"{prediction:.2f}")
+
+    c2.metric("Performance", level)
+
+    c3.metric("Result", result)
+
+    st.markdown("---")
+
+    st.subheader("💡 Personalized Recommendations")
+
+    tips=[]
+
+    if hours_studied < 6:
+        tips.append("📚 Increase study hours to at least 6–8 hours.")
+
+    if sleep_hours < 7:
+        tips.append("😴 Maintain 7–8 hours of sleep.")
+
+    if attendance_percent < 85:
+        tips.append("🎯 Improve attendance above 85%.")
+
+    if previous_scores < 70:
+        tips.append("📝 Focus on improving fundamentals.")
+
+    if len(tips)==0:
+        tips.append("🎉 Excellent habits! Keep maintaining consistency.")
+
+    for tip in tips:
+        st.markdown(f"""
+        <div class="tip">
+        {tip}
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("---")
+
+    st.markdown("""
+    <div class="footer">
+    Developed using ❤️ Streamlit & Scikit-Learn
+    </div>
+    """, unsafe_allow_html=True)
